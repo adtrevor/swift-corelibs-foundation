@@ -69,7 +69,7 @@ open class JSONSerialization : NSObject {
             }
             
             if !(obj is _NSNumberCastingWithoutBridging) {
-              if obj is String || obj is NSNull || obj is Int || obj is Bool || obj is UInt ||
+              if obj is String || obj is Substring || obj is NSNull || obj is Int || obj is Bool || obj is UInt ||
                   obj is Int8 || obj is Int16 || obj is Int32 || obj is Int64 ||
                   obj is UInt8 || obj is UInt16 || obj is UInt32 || obj is UInt64 {
                   return true
@@ -327,6 +327,8 @@ private struct JSONWriter {
         switch (obj) {
         case let str as String:
             try serializeString(str)
+        case let substr as Substring:
+            try serializeString(substr)
         case let boolValue as Bool:
             writer(boolValue.description)
         case let num as Int:
@@ -371,7 +373,7 @@ private struct JSONWriter {
         }
     }
 
-    func serializeString(_ str: String) throws {
+    func serializeString<S: StringProtocol>(_ str: S) throws {
         writer("\"")
         for scalar in str.unicodeScalars {
             switch scalar {
@@ -477,6 +479,8 @@ private struct JSONWriter {
             }
 
             if let key = key as? String {
+                try serializeString(key)
+            } else if let key = key as? Substring {
                 try serializeString(key)
             } else {
                 throw NSError(domain: NSCocoaErrorDomain, code: CocoaError.propertyListReadCorrupt.rawValue, userInfo: [NSDebugDescriptionErrorKey : "NSDictionary key must be NSString"])

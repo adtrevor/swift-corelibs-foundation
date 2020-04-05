@@ -906,6 +906,11 @@ extension TestJSONSerialization {
                     NSNumber(value: Int(0))
                 )
             ),
+            
+            Array<Any>(arrayLiteral:
+                Substring("substring"),
+                "string"
+            )
         ]
         for testCase in trueJSON {
             XCTAssertTrue(JSONSerialization.isValidJSONObject(testCase))
